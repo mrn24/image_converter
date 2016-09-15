@@ -13,6 +13,8 @@ typedef struct Image{
   RGBpixel *buffer;
 }Image;
 
+int read_image(char* input);
+
 Image image;
 
 int main(int argc, char **argv){
@@ -31,6 +33,7 @@ int main(int argc, char **argv){
 int read_image(char* input){
   FILE* fp = fopen(input, "r");
   int c;
+  unsigned int s;
   c = fgetc(fp);
   printf("%c\n", c);
   if(c!= 'P'){
@@ -47,18 +50,43 @@ int read_image(char* input){
   c = fgetc(fp);
   c = fgetc(fp);
   printf("%c\n", c);
-
+  printf("comment while\n");
   while (c == '#'){
     while(c != '\n'){
       c = fgetc(fp);
     }
   }
+  printf("out of comment while\n");
   while(c == ' '){
     c = fgetc(fp);
   }
   //c = fgetc(fp);
-  fscanf(fp, "%d %d %d", &image.width, &image.height, &image.range);
-  printf("%d - %d - %d\n", image.width, image.height, image.range);
-  
+  fscanf(fp, "%d %d %d ", &image.width, &image.height, &image.range);
+  printf("%d - %d - %d - %c\n", image.width, image.height, image.range, image.format);
+  //<------HERE!
+  printf("Setting up while");
+  //image.buffer = malloc(sizeof(image));
+  int j = 0;
+  int i = 0;
+  while(fscanf(fp, " %u ", s) != EOF){
+    c = atoi(s);
+    printf("While\n");
+    if(i == 0){
+      image.buffer[j].r = c;
+      i++;
+    }else if(i == 1){
+      image.buffer[j].g = c;
+      i++;
+    }else{
+      image.buffer[j].b = c;
+      i = 0;
+      j++;
+    }
+  }
+
+  /*for(i = 0; i<j; i++){
+    printf("%d, %d, %d\n", image.buffer[i].r, image.buffer[i].g, image.buffer[i].b);
+  }*/
+
   return 0;
 }
