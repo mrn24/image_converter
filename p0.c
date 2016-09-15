@@ -33,8 +33,8 @@ int main(int argc, char *argv[]){
 		fprintf(stderr, "Input file invalid\n");
 		exit(9);
 	}
+	//Access Magic Number
   int c;
-  int s;
   c = fgetc(fp);
   if(c != 'P'){
     fprintf(stderr, "Not a PPM File\n");
@@ -45,6 +45,7 @@ int main(int argc, char *argv[]){
     fprintf(stderr, "Something went wrong\n");
     return -1;
   }
+	//Depending on Magic Number, send to appropriate read fn.
   if ((c = fgetc(fp)) == '6'){
     fclose(fp);
     read_p6(argv[2]);
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]){
     fclose(fp);
     read_p3(argv[2]);
   }else{
-    printf("File error!");
+    fprintf(stderr, "Filetype has incompatible magic number\n");
     return 3;
   }
 	if(writeType == 6){
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]){
 		return -1;
 	}
 
-  return 1;
+  return 0;
 }
 
 int read_p6(char* input){
