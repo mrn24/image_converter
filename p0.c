@@ -13,7 +13,8 @@ typedef struct Image{
   RGBpixel *buffer;
 }Image;
 
-int read_image(char* input);
+int read_p6(char* input);
+int read_p3(char* input);
 
 Image image;
 
@@ -25,15 +26,15 @@ int main(int argc, char **argv){
   char mn_buffer[8];
   char buffer[100];
 
-  int i = read_image("./SamplePPMAscii.ppm");
+  int i = read_p6("./SamplePPMBinary.ppm");
   printf("%d\n", i);
   return 1;
 }
 
-int read_image(char* input){
+int read_p6(char* input){
   FILE* fp = fopen(input, "r");
   int c;
-  unsigned int s;
+  int s;
   c = fgetc(fp);
   printf("%c\n", c);
   if(c!= 'P'){
@@ -60,17 +61,56 @@ int read_image(char* input){
   while(c == ' '){
     c = fgetc(fp);
   }
+  fscanf(fp, "%d %d %d ", &image.width, &image.height, &image.range);
+  printf("%d - %d - %d - %c\n", image.width, image.height, image.range, image.format);
+
+  while((c = fgetc(fp)) != EOF){
+    printf("%c\n", c);
+  }
+
+  return 0;
+}
+int read_p3(char* input){
+  FILE* fp = fopen(input, "r");
+  int c;
+  int s;
+  c = fgetc(fp);
+  printf("%c\n", c);
+  if(c!= 'P'){
+    printf("Not a PPM File\n");
+    return 0;
+  }else if(c == 'P'){
+    printf("Is a PPM File\n");
+  }else{
+    printf("I dunno");
+    return 0;
+  }
+  c = fgetc(fp);
+  image.format = c;
+  c = fgetc(fp);
+  c = fgetc(fp);
+  printf("%c\n", c);
+  printf("comment while\n");
+  while (c == '#'){
+    while(c != '\n'){
+      c = fgetc(fp);
+    }
+  }
+  printf("out of comment while\n");
+  while(c == ' '){
+    c = fgetc(fp);
+  }
+  printf("testing\n");
   //c = fgetc(fp);
   fscanf(fp, "%d %d %d ", &image.width, &image.height, &image.range);
   printf("%d - %d - %d - %c\n", image.width, image.height, image.range, image.format);
   //<------HERE!
-  printf("Setting up while");
-  //image.buffer = malloc(sizeof(image));
+  printf("Setting up while\n");
+  image.buffer = malloc(sizeof(image.height * image.width));
   int j = 0;
   int i = 0;
-  while(fscanf(fp, " %u ", s) != EOF){
-    c = atoi(s);
-    printf("While\n");
+  while((fscanf(fp, "%d ", &c)) != EOF){
+    //printf("%d\n", c);
     if(i == 0){
       image.buffer[j].r = c;
       i++;
@@ -84,9 +124,9 @@ int read_image(char* input){
     }
   }
 
-  /*for(i = 0; i<j; i++){
+  for(i = 0; i<j; i++){
     printf("%d, %d, %d\n", image.buffer[i].r, image.buffer[i].g, image.buffer[i].b);
-  }*/
+  }
 
   return 0;
 }
